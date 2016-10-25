@@ -101,7 +101,17 @@ class BasicClient:
         # Reset attributes and connect.
         if not reconnect:
             self._reset_connection_attributes()
-        self._connect(hostname=hostname, port=port, reconnect=reconnect, **kwargs)
+
+        try:
+            self._connect(hostname=hostname, port=port, reconnect=reconnect, **kwargs)
+        except ConnectionRefusedError:
+            if reconnect is True:
+                self.on_disconnect(
+                    expected=False,
+                )
+                raise
+            else:
+                raise
 
         # Schedule pinger.
         self._ping_checker_handle = self.eventloop.schedule_periodically(PING_TIMEOUT / 2, self._check_ping_timeout)
