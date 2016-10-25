@@ -105,13 +105,9 @@ class BasicClient:
         try:
             self._connect(hostname=hostname, port=port, reconnect=reconnect, **kwargs)
         except ConnectionRefusedError:
-            if reconnect is True:
-                self.on_disconnect(
-                    expected=False,
-                )
-                raise
-            else:
-                raise
+            self.on_disconnect(
+                expected=False,
+            )
 
         # Schedule pinger.
         self._ping_checker_handle = self.eventloop.schedule_periodically(PING_TIMEOUT / 2, self._check_ping_timeout)
